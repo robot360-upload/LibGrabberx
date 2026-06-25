@@ -89,12 +89,19 @@ public class MainActivity extends AppCompatActivity {
     //-- open native .so file picker
     private void openFilePicker() {
 
+        if (!hasStoragePermission()) {
+            permissionsAppe();
+            return;
+        }
+
+        File root = getRootStorageDir();
+
         DialogProperties properties = new DialogProperties();
         properties.selection_mode = DialogConfigs.SINGLE_MODE;
         properties.selection_type = DialogConfigs.FILE_SELECT;
-        properties.root = new File(DialogConfigs.DEFAULT_DIR);
-        properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
-        properties.offset = new File(DialogConfigs.DEFAULT_DIR);
+        properties.root = root;
+        properties.error_dir = root;
+        properties.offset = root;
         properties.extensions = new String[]{"so"};
 
         FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
@@ -115,12 +122,19 @@ public class MainActivity extends AppCompatActivity {
     //-- pick output folder, auto-name the .hpp from the chosen .so
     private void openFolderPicker() {
 
+        if (!hasStoragePermission()) {
+            permissionsAppe();
+            return;
+        }
+
+        File root = getRootStorageDir();
+
         DialogProperties properties = new DialogProperties();
         properties.selection_mode = DialogConfigs.SINGLE_MODE;
         properties.selection_type = DialogConfigs.DIR_SELECT;
-        properties.root = new File(DialogConfigs.DEFAULT_DIR);
-        properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
-        properties.offset = new File(DialogConfigs.DEFAULT_DIR);
+        properties.root = root;
+        properties.error_dir = root;
+        properties.offset = root;
 
         FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
         dialog.setTitle("Select output folder");
@@ -150,6 +164,27 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    //-- resolve the real shared-storage root, bypassing Environment.getExternalStorageDirectory()
+    //-- which on some Android 12+ ROMs (notably MIUI) resolves through a symlink into /mnt
+    //-- instead of the real /storage/emulated/0 path.
+    private File getRootStorageDir() {
+
+        File candidate = new File("/storage/emulated/0");
+        if (candidate.exists() && candidate.isDirectory() && candidate.canRead()) {
+            return candidate;
+        }
+
+        try {
+            File resolved = Environment.getExternalStorageDirectory().getCanonicalFile();
+            if (resolved.exists() && resolved.isDirectory()) {
+                return resolved;
+            }
+        } catch (java.io.IOException ignored) {
+        }
+
+        return Environment.getExternalStorageDirectory();
+    }
+
     //-- deep write
     private void permissionsAppe() {
 
@@ -160,6 +195,15 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 }, 100);
             }
+        }
+    }
+
+    private boolean hasStoragePermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else {
+            return checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
     }
 
