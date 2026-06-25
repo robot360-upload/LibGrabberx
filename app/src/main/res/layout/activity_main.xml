@@ -22,24 +22,68 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <EditText
-            android:id="@+id/in1"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="enter so full path"
-            android:textColor="#000000"
-            android:textColorHint="#888888"
-            android:padding="12dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <EditText
-            android:id="@+id/in2"
+            <EditText
+                android:id="@+id/in1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="enter so full path"
+                android:textColor="#000000"
+                android:textColorHint="#888888"
+                android:padding="12dp"/>
+
+            <Button
+                android:id="@+id/browse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:background="#D6D6D6"
+                android:layout_marginStart="8dp"
+                android:minWidth="0dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="output path .hpp"
-            android:textColor="#000000"
-            android:textColorHint="#888888"
-            android:layout_marginTop="12dp"
-            android:padding="12dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp">
+
+            <EditText
+                android:id="@+id/in2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="output path .hpp"
+                android:textColor="#000000"
+                android:textColorHint="#888888"
+                android:padding="12dp"/>
+
+            <Button
+                android:id="@+id/browse2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="..."
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:background="#D6D6D6"
+                android:layout_marginStart="8dp"
+                android:minWidth="0dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/dum"

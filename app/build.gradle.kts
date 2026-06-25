@@ -5,7 +5,7 @@ plugins {
 android {
     namespace = "antik.libgrabber"
     compileSdk {
-        version = release(37) {
+        version = release(36) {
             minorApiLevel = 1
         }
     }
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "antik.libgrabber"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 2
         versionName = "2.0"
 
@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
+    implementation(libs.filepicker)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
