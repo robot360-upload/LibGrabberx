@@ -27,12 +27,17 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.github.angads25.filepicker.controller.DialogSelectionListener;
+import com.github.angads25.filepicker.model.DialogConfigs;
+import com.github.angads25.filepicker.model.DialogProperties;
+import com.github.angads25.filepicker.view.FilePickerDialog;
+
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText in1, in2;
-    private Button lever;
+    private Button lever, browse, browse2;
     private TextView stone;
     private ProgressBar proccce;
 
@@ -52,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         in1 = findViewById(R.id.in1);
         in2 = findViewById(R.id.in2);
         lever = findViewById(R.id.dum);
+        browse = findViewById(R.id.browse);
+        browse2 = findViewById(R.id.browse2);
         stone = findViewById(R.id.sta);
         proccce = findViewById(R.id.proc);
 
@@ -62,7 +69,85 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        browse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFilePicker();
+            }
+        });
+
+        browse2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFolderPicker();
+            }
+        });
+
         permissionsAppe();
+    }
+
+    //-- open native .so file picker
+    private void openFilePicker() {
+
+        DialogProperties properties = new DialogProperties();
+        properties.selection_mode = DialogConfigs.SINGLE_MODE;
+        properties.selection_type = DialogConfigs.FILE_SELECT;
+        properties.root = new File(DialogConfigs.DEFAULT_DIR);
+        properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
+        properties.offset = new File(DialogConfigs.DEFAULT_DIR);
+        properties.extensions = new String[]{"so"};
+
+        FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
+        dialog.setTitle("Select .so file");
+
+        dialog.setDialogSelectionListener(new DialogSelectionListener() {
+            @Override
+            public void onSelectedFilePaths(String[] files) {
+                if (files != null && files.length > 0) {
+                    in1.setText(files[0]);
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
+    //-- pick output folder, auto-name the .hpp from the chosen .so
+    private void openFolderPicker() {
+
+        DialogProperties properties = new DialogProperties();
+        properties.selection_mode = DialogConfigs.SINGLE_MODE;
+        properties.selection_type = DialogConfigs.DIR_SELECT;
+        properties.root = new File(DialogConfigs.DEFAULT_DIR);
+        properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
+        properties.offset = new File(DialogConfigs.DEFAULT_DIR);
+
+        FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
+        dialog.setTitle("Select output folder");
+
+        dialog.setDialogSelectionListener(new DialogSelectionListener() {
+            @Override
+            public void onSelectedFilePaths(String[] files) {
+                if (files != null && files.length > 0) {
+
+                    String folder = files[0];
+                    String input = in1.getText().toString().trim();
+                    String baseName = "output";
+
+                    if (!TextUtils.isEmpty(input)) {
+                        File inFile = new File(input);
+                        String name = inFile.getName();
+                        int dot = name.lastIndexOf('.');
+                        baseName = (dot > 0) ? name.substring(0, dot) : name;
+                    }
+
+                    File outFile = new File(folder, baseName + ".hpp");
+                    in2.setText(outFile.getAbsolutePath());
+                }
+            }
+        });
+
+        dialog.show();
     }
 
     //-- deep write
